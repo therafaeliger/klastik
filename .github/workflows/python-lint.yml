@@ -1,0 +1,36 @@
+name: Python Code Standards Check
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        shell: bash
+        run: |
+          # If requirements.txt exists, install its dependencies.
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          # Install flake8 and nbqa for linting
+          pip install flake8 nbqa
+
+      - name: Run flake8 Lint Check on Python Files
+        run: flake8 .
+
+      - name: Run nbqa flake8 on Notebooks
+        run: nbqa flake8 .
